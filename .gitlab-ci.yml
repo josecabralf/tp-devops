@@ -1,0 +1,35 @@
+stages:
+  - code-linting
+
+variables:
+  ALUMNO: 85505-85829-92425
+  TAG: Lubuntu
+
+code-lint-python:
+  stage: code-linting
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: python-code-linting-$ALUMNO.txt
+  script:
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - chmod 700 ./run_pylint.sh
+    - ./run_pylint.sh > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
+
+code-lint-node:
+  stage: code-linting
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: node-api-linting-$ALUMNO.txt
+  script:
+    - npm install
+    - npx eslint . > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
+

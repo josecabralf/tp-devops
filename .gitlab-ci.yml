@@ -15,6 +15,7 @@ code-lint-python:
   script:
     - python3 -m venv venv
     - source venv/bin/activate
+    - pip install pylint
     - chmod 700 ./run_pylint.sh
     - ./run_pylint.sh > $ARTIFACT_FILE_NAME
   artifacts:
@@ -29,6 +30,7 @@ code-lint-node:
   variables:
     ARTIFACT_FILE_NAME: node-api-linting-$ALUMNO.txt
   script:
+    - cd api-node
     - npm install
     - npx eslint . > $ARTIFACT_FILE_NAME
   artifacts:

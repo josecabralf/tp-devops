@@ -34,7 +34,7 @@ code-lint-node:
     - cd api-node
     - npm install
     - npm install eslint
-    - npx eslint > $ARTIFACT_FILE_NAME
+    - ./run_eslint.sh > $ARTIFACT_FILE_NAME
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME

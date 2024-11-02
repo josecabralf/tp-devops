@@ -3,7 +3,7 @@ stages:
 
 variables:
   ALUMNO: 85505-85829-92425
-  TAG: Lubuntu
+  TAG: devops-runner
 
 code-lint-python:
   stage: code-linting

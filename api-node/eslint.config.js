@@ -1,18 +1,19 @@
-export default [
+// eslint.config.js
+module.exports = [
   {
-    ignores: ["node_modules"], // Ignore the node_modules folder
+    ignores: ["node_modules"],
   },
   {
-    files: ["**/*.js"], // Lint all JavaScript files
+    files: ["**/*.js"],
     languageOptions: {
-      ecmaVersion: "latest", // Use the latest ECMAScript standard
-      sourceType: "module",  // Support ES modules
+      ecmaVersion: "latest",
+      sourceType: "module",
     },
     rules: {
-      "no-unused-vars": "warn", // Warn about unused variables
-      "no-console": "off",      // Allow console statements
-      "semi": ["error", "always"], // Enforce semicolons
-      "quotes": ["error", "single"] // Enforce single quotes
+      "no-unused-vars": "warn",
+      "no-console": "off",
+      "semi": ["error", "always"],
+      "quotes": ["error", "single"]
     },
   },
 ];

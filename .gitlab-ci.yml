@@ -6,6 +6,7 @@ variables:
   TAG: devops-runner
 
 code-lint-python:
+  image: python:3.10
   stage: code-linting
   tags:
     - $TAG
@@ -21,6 +22,7 @@ code-lint-python:
       - $ARTIFACT_FILE_NAME
 
 code-lint-node:
+  image: node:18
   stage: code-linting
   tags:
     - $TAG
@@ -32,4 +34,3 @@ code-lint-node:
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME
-

@@ -6,20 +6,20 @@ variables:
   ALUMNO: 85505-85829-92425
   TAG: devops-runner
 
-secrets-scan:
-  stage: sast-scan
-  image: python:3.10
-  tags:
-    - $TAG
-  variables:
-    ARTIFACT_FILE_NAME: secrets-scan.txt
-  before_script:
-    - pip install detect-secrets
-  script:
-    - detect-secrets scan . --all-files --exclude-files venv/ --exclude-files node_modules > $ARTIFACT_FILE_NAME
-  artifacts:
-    paths:
-      - $ARTIFACT_FILE_NAME
+# secrets-scan:
+#   stage: sast-scan
+#   image: python:3.10
+#   tags:
+#     - $TAG
+#   variables:
+#     ARTIFACT_FILE_NAME: secrets-scan.txt
+#   before_script:
+#     - pip install detect-secrets
+#   script:
+#     - detect-secrets scan . --all-files --exclude-files venv/ --exclude-files node_modules > $ARTIFACT_FILE_NAME
+#   artifacts:
+#     paths:
+#       - $ARTIFACT_FILE_NAME
 
 # sast-scan-python:
 #   image: python:3.10

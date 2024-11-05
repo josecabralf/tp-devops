@@ -55,7 +55,7 @@ variables:
 #     paths:
 #       - $ARTIFACT_FILE_NAME
 
-sast-scan-node:
+sast-scan-js:
   stage: sast-scan
   image: python:3.10
   variables:
@@ -68,8 +68,8 @@ sast-scan-node:
     - source venv/bin/activate
     - pip install njsscan
     - chmod 700 run_njsscan.sh
-    - ./run_njsscan.sh api-node $ARTIFACT_FILE_NAME_NODE
-    - ./run_njsscan.sh web $ARTIFACT_FILE_NAME_REACT
+    - ./run_njsscan.sh api-node > $ARTIFACT_FILE_NAME_NODE
+    - ./run_njsscan.sh web > $ARTIFACT_FILE_NAME_REACT
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME

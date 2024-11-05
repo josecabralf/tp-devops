@@ -1,3 +1,3 @@
 #!/bin/sh
-njsscan $1 -o $2
+njsscan $1
 exit 0

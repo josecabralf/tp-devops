@@ -31,8 +31,10 @@ code-lint-node:
   variables:
     ARTIFACT_FILE_NAME: node-api-linting-$ALUMNO.txt
   script:
+    - cd api-node
     - npm install
     - npm install eslint --save-dev
+    - cd ..
     - chmod 700 ./run_eslint.sh
     - ./run_eslint.sh api-node > $ARTIFACT_FILE_NAME
   artifacts:
@@ -47,8 +49,10 @@ code-lint-react:
   variables:
     ARTIFACT_FILE_NAME: web-linting-$ALUMNO.txt
   script:
+    - cd web
     - npm install
     - npm install eslint --save-dev
+    - cd ..
     - chmod 700 ./run_eslint.sh
     - ./run_eslint.sh web > $ARTIFACT_FILE_NAME
   artifacts:

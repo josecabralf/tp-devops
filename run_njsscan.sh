@@ -1,3 +1,3 @@
 #!/bin/sh
-njsscan dvna/ -o $1
+njsscan $1 -o $2
 exit 0

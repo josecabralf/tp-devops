@@ -59,22 +59,21 @@ sast-scan-node:
   stage: sast-scan
   image: python:3.10
   variables:
-    ARTIFACT_FILE_NAME: njsscan_report.txt
+    ARTIFACT_FILE_NAME_NODE: njsscan_report_node.txt
+    ARTIFACT_FILE_NAME_REACT: njsscan_report_react.txt
   tags:
     - $TAG
-  before_script:
-    - pip install virtualenv
-    - virtualenv venv
+  script:
+    - python3 -m venv venv
     - source venv/bin/activate
     - pip install njsscan
-  script:
-    - njsscan --version
     - chmod 700 run_njsscan.sh
-    - ./run_njsscan.sh $ARTIFACT_FILE_NAME
-    - cat $ARTIFACT_FILE_NAME
+    - ./run_njsscan.sh api-node $ARTIFACT_FILE_NAME_NODE
+    - ./run_njsscan.sh web $ARTIFACT_FILE_NAME_REACT
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME
+      - $ARTIFACT_FILE_NAME_REACT
 
 
 # code-lint-python:

@@ -2,6 +2,9 @@
 
 ### ETAPA SECRETS
 
+Ninguna complicación grande.
+Pudimos corroborar que se pueden generar 2 artefactos en un mismo job.
+
 ### ETAPA: LINT
 /bin/sh: eval: line 133: npm: not found
 /bin/sh: eval: line 133: python3: not found

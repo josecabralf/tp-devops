@@ -1,79 +1,79 @@
 stages:
   - sast-scan
-  # - code-linting
+  - code-linting
 
 variables:
   ALUMNO: 85505-85829-92425
   TAG: devops-runner
 
-# secrets-scan:
-#   stage: sast-scan
-#   image: python:3.10
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: secrets-scan.txt
-#   before_script:
-#     - pip install detect-secrets
-#   script:
-#     - detect-secrets scan . --all-files --exclude-files venv/ --exclude-files node_modules > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+secrets-scan:
+  stage: sast-scan
+  image: python:3.10
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: secrets-scan.txt
+  before_script:
+    - pip install detect-secrets
+  script:
+    - detect-secrets scan . --all-files --exclude-files venv/ --exclude-files node_modules > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
 
-# sast-scan-python:
-#   image: python:3.10
-#   stage: sast-scan
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: python-secrets-scan-$ALUMNO.txt
-#   script:
-#     - python3 -m venv venv
-#     - source venv/bin/activate
-#     - pip install bandit
-#     - chmod 700 run_bandit.sh
-#     - ./run_bandit.sh > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+sast-scan-python:
+  image: python:3.10
+  stage: sast-scan
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: python-secrets-scan-$ALUMNO.txt
+  script:
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install bandit
+    - chmod 700 run_bandit.sh
+    - ./run_bandit.sh > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
 
-# sca-scan-python:
-#   image: python:3.10
-#   stage: sast-scan
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: python-safety-scan-$ALUMNO.txt
-#   script:
-#     - python3 -m venv venv
-#     - source venv/bin/activate
-#     - pip install safety
-#     - chmod 700 run_safety.sh
-#     - ./run_safety.sh > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+sca-scan-python:
+  image: python:3.10
+  stage: sast-scan
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: python-safety-scan-$ALUMNO.txt
+  script:
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install safety
+    - chmod 700 run_safety.sh
+    - ./run_safety.sh > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
 
-# sast-scan-js:
-#   stage: sast-scan
-#   image: python:3.10
-#   variables:
-#     ARTIFACT_FILE_NAME_NODE: njsscan_report_node.txt
-#     ARTIFACT_FILE_NAME_REACT: njsscan_report_react.txt
-#   tags:
-#     - $TAG
-#   script:
-#     - python3 -m venv venv
-#     - source venv/bin/activate
-#     - pip install njsscan
-#     - chmod 700 run_njsscan.sh
-#     - ./run_njsscan.sh api-node > $ARTIFACT_FILE_NAME_NODE
-#     - ./run_njsscan.sh web > $ARTIFACT_FILE_NAME_REACT
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME_NODE
-#       - $ARTIFACT_FILE_NAME_REACT
+sast-scan-js:
+  stage: sast-scan
+  image: python:3.10
+  variables:
+    ARTIFACT_FILE_NAME_NODE: njsscan_report_node.txt
+    ARTIFACT_FILE_NAME_REACT: njsscan_report_react.txt
+  tags:
+    - $TAG
+  script:
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install njsscan
+    - chmod 700 run_njsscan.sh
+    - ./run_njsscan.sh api-node > $ARTIFACT_FILE_NAME_NODE
+    - ./run_njsscan.sh web > $ARTIFACT_FILE_NAME_REACT
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME_NODE
+      - $ARTIFACT_FILE_NAME_REACT
 
 sca-scan-js:
   stage: sast-scan
@@ -116,56 +116,56 @@ sca-scan-js:
       - $ARTIFACT_FILE_NAME_REACT
 
 
-# code-lint-python:
-#   image: python:3.10
-#   stage: code-linting
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: python-code-linting-$ALUMNO.txt
-#   script:
-#     - python3 -m venv venv
-#     - pip install --upgrade pip
-#     - source venv/bin/activate
-#     - pip install pylint
-#     - chmod 700 ./run_pylint.sh
-#     - ./run_pylint.sh > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+code-lint-python:
+  image: python:3.10
+  stage: code-linting
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: python-code-linting-$ALUMNO.txt
+  script:
+    - python3 -m venv venv
+    - pip install --upgrade pip
+    - source venv/bin/activate
+    - pip install pylint
+    - chmod 700 ./run_pylint.sh
+    - ./run_pylint.sh > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
 
-# code-lint-node:
-#   image: node:18
-#   stage: code-linting
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: node-api-linting-$ALUMNO.txt
-#   script:
-#     - cd api-node
-#     - npm install
-#     - npm install eslint --save-dev
-#     - cd ..
-#     - chmod 700 ./run_eslint.sh
-#     - ./run_eslint.sh api-node > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+code-lint-node:
+  image: node:18
+  stage: code-linting
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: node-api-linting-$ALUMNO.txt
+  script:
+    - cd api-node
+    - npm install
+    - npm install eslint --save-dev
+    - cd ..
+    - chmod 700 ./run_eslint.sh
+    - ./run_eslint.sh api-node > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
 
-# code-lint-react:
-#   image: node:18
-#   stage: code-linting
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: web-linting-$ALUMNO.txt
-#   script:
-#     - cd web
-#     - npm install
-#     - npm install eslint --save-dev
-#     - cd ..
-#     - chmod 700 ./run_eslint.sh
-#     - ./run_eslint.sh web > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+code-lint-react:
+  image: node:18
+  stage: code-linting
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: web-linting-$ALUMNO.txt
+  script:
+    - cd web
+    - npm install
+    - npm install eslint --save-dev
+    - cd ..
+    - chmod 700 ./run_eslint.sh
+    - ./run_eslint.sh web > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME

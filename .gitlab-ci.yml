@@ -1,41 +1,77 @@
 stages:
-  - secrets-scan
+  - sast-scan
   # - code-linting
 
 variables:
   ALUMNO: 85505-85829-92425
   TAG: devops-runner
 
-sast-scan-python:
+secrets-scan:
+  stage: sast-scan
   image: python:3.10
-  stage: secrets-scan
   tags:
     - $TAG
   variables:
-    ARTIFACT_FILE_NAME: python-secrets-scan-$ALUMNO.txt
+    ARTIFACT_FILE_NAME: secrets-scan.txt
+  before_script:
+    - pip install detect-secrets
   script:
-    - python3 -m venv venv
-    - source venv/bin/activate
-    - pip install bandit
-    - chmod 700 run_bandit.sh
-    - ./run_bandit.sh > $ARTIFACT_FILE_NAME
+    - detect-secrets scan . --all-files --exclude-files venv/ --exclude-files node_modules > $ARTIFACT_FILE_NAME
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME
 
-sca-scan-python:
+# sast-scan-python:
+#   image: python:3.10
+#   stage: sast-scan
+#   tags:
+#     - $TAG
+#   variables:
+#     ARTIFACT_FILE_NAME: python-secrets-scan-$ALUMNO.txt
+#   script:
+#     - python3 -m venv venv
+#     - source venv/bin/activate
+#     - pip install bandit
+#     - chmod 700 run_bandit.sh
+#     - ./run_bandit.sh > $ARTIFACT_FILE_NAME
+#   artifacts:
+#     paths:
+#       - $ARTIFACT_FILE_NAME
+
+# sca-scan-python:
+#   image: python:3.10
+#   stage: sast-scan
+#   tags:
+#     - $TAG
+#   variables:
+#     ARTIFACT_FILE_NAME: python-safety-scan-$ALUMNO.txt
+#   script:
+#     - python3 -m venv venv
+#     - source venv/bin/activate
+#     - pip install safety
+#     - chmod 700 run_safety.sh
+#     - ./run_safety.sh > $ARTIFACT_FILE_NAME
+#   artifacts:
+#     paths:
+#       - $ARTIFACT_FILE_NAME
+
+sast-scan-node:
+  stage: sast-scan
   image: python:3.10
-  stage: secrets-scan
+  variables:
+    ARTIFACT_FILE_NAME: njsscan_report.txt
   tags:
     - $TAG
-  variables:
-    ARTIFACT_FILE_NAME: python-safety-scan-$ALUMNO.txt
-  script:
-    - python3 -m venv venv
+  before_script:
+    - pip install virtualenv
+    - virtualenv venv
     - source venv/bin/activate
-    - pip install safety
-    - chmod 700 run_safety.sh
-    - ./run_safety.sh > $ARTIFACT_FILE_NAME
+    - pip install njsscan
+  script:
+    - njsscan --version
+    - chmod 700 run_njsscan.sh
+    - ./run_njsscan.sh $ARTIFACT_FILE_NAME
+    - cat $ARTIFACT_FILE_NAME
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME

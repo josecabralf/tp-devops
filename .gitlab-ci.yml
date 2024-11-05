@@ -6,7 +6,8 @@ variables:
   ALUMNO: 85505-85829-92425
   TAG: devops-runner
 
-sast-scan-api:
+sast-scan-python:
+  image: python:3.10
   stage: secrets-scan
   tags:
     - $TAG
@@ -22,7 +23,8 @@ sast-scan-api:
     paths:
       - $ARTIFACT_FILE_NAME
 
-sca-scan-api:
+sca-scan-python:
+  image: python:3.10
   stage: secrets-scan
   tags:
     - $TAG

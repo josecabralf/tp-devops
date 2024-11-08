@@ -13,3 +13,4 @@ EXPOSE 5000
 
 # Run the server when container is launched
 CMD ["python", "main.py"]
+

@@ -4,7 +4,7 @@ from db_config import mysql
 from flask import jsonify
 from flask import flash, request
 from werkzeug.security import generate_password_hash, check_password_hash
-		
+
 @app.route('/users', methods=['POST'])
 def add_user():
 	try:
@@ -32,11 +32,11 @@ def add_user():
 	except Exception as e:
 		print(e)
 	finally:
-		cursor.close() 
+		cursor.close()
 		conn.close()
 
 
-		
+
 @app.route('/users')
 def users():
 	try:
@@ -53,9 +53,9 @@ def users():
 	except Exception as e:
 		print(e)
 	finally:
-		cursor.close() 
+		cursor.close()
 		conn.close()
-		
+
 @app.route('/users/<int:id>')
 def user(id):
 	try:
@@ -69,7 +69,7 @@ def user(id):
 	except Exception as e:
 		print(e)
 	finally:
-		cursor.close() 
+		cursor.close()
 		conn.close()
 
 @app.route('/users/<int:id>', methods=['PUT'])
@@ -79,7 +79,7 @@ def update_user(id):
 		_id = id
 		_name = _json['name']
 		_email = _json['email']
-		_password = _json['pwd']		
+		_password = _json['pwd']
 		# validate the received values
 		if _name and _email and _password and _id and request.method == 'PUT':
 			#do not save password as a plain text
@@ -99,9 +99,9 @@ def update_user(id):
 	except Exception as e:
 		print(e)
 	finally:
-		cursor.close() 
+		cursor.close()
 		conn.close()
-		
+
 @app.route('/users/<int:id>', methods=['DELETE'])
 def delete_user(id):
 	try:
@@ -115,9 +115,9 @@ def delete_user(id):
 	except Exception as e:
 		print(e)
 	finally:
-		cursor.close() 
+		cursor.close()
 		conn.close()
-		
+
 @app.errorhandler(404)
 def not_found(error=None):
     message = {
@@ -127,8 +127,7 @@ def not_found(error=None):
     resp = jsonify(message)
     resp.status_code = 404
     return resp
-		
+
 if __name__ == "__main__":
     #app.run()
     app.run(host='0.0.0.0')
-	

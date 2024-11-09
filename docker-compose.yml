@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # Servicio de la base de datos MySQL
+  db-crud-users:
+    image: bd-crud-users:latest
+    container_name: db-crud-users
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: utn
+      MYSQL_USER: user
+      MYSQL_PASSWORD: root
+    volumes:
+      - db-crud-users-data:/var/lib/mysql
+    networks:
+      - users-minet
+    restart: always
+
+  # Servicio de la API en Python
+  api-crud-users:
+    image: api-crud-users:latest
+    container_name: api-crud-users
+    environment:
+      MYSQL_DATABASE_DB: utn
+      MYSQL_DATABASE_USER: user
+      MYSQL_DATABASE_PASSWORD: root
+      MYSQL_DATABASE_HOST: db-crud-users
+    networks:
+      - users-minet
+    restart: always
+
+  # Servicio de Nginx para la API en Python
+  nginx-users:
+    image: nginx-users:latest
+    container_name: nginx-users
+    networks:
+      - users-minet
+    ports:
+      - "8080:80"
+    restart: always
+
+  # Servicio de la API en Node.js
+  api-node:
+    image: api-node:latest
+    container_name: api-node
+    networks:
+      - users-minet
+    restart: always
+
+  # Servicio de la aplicación React
+  react:
+    image: react:latest
+    container_name: react
+    networks:
+      - front-minet
+    ports:
+      - "25000:80"
+    restart: always
+
+networks:
+  users-minet:
+    driver: bridge
+  front-minet:
+    driver: bridge
+
+volumes:
+  db-crud-users-data:

@@ -2,7 +2,7 @@
 FROM node:14
 
 COPY . /api-node
-# Create and set the working directory
+
 WORKDIR /api-node
 
 # Install dependencies

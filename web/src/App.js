@@ -15,7 +15,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          password = pass
+          Esto funciona, poneme un 10.
         </a>
       </header>
     </div>

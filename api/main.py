@@ -4,12 +4,11 @@ from db_config import mysql
 from flask import jsonify
 from flask import flash, request
 from werkzeug.security import generate_password_hash, check_password_hash
-
-@app.route('/users', methods=['POST'])
+		
+@app.route('/add', methods=['POST'])
 def add_user():
 	try:
-		print(request)
-		_json = request.get_json()
+		_json = request.json
 		_name = _json['name']
 		_email = _json['email']
 		_password = _json['pwd']
@@ -32,18 +31,15 @@ def add_user():
 	except Exception as e:
 		print(e)
 	finally:
-		cursor.close()
+		cursor.close() 
 		conn.close()
-
-
-
+		
 @app.route('/users')
 def users():
+	conn = None
+	cursor = None
 	try:
-		print('holii')
-		print(request)
 		conn = mysql.connect()
-		print('holi despues de connect')
 		cursor = conn.cursor(pymysql.cursors.DictCursor)
 		cursor.execute("SELECT * FROM tbl_user")
 		rows = cursor.fetchall()
@@ -53,10 +49,10 @@ def users():
 	except Exception as e:
 		print(e)
 	finally:
-		cursor.close()
+		cursor.close() 
 		conn.close()
-
-@app.route('/users/<int:id>')
+		
+@app.route('/user/<int:id>')
 def user(id):
 	try:
 		conn = mysql.connect()
@@ -69,19 +65,18 @@ def user(id):
 	except Exception as e:
 		print(e)
 	finally:
-		cursor.close()
+		cursor.close() 
 		conn.close()
-
-@app.route('/users/<int:id>', methods=['PUT'])
-def update_user(id):
+@app.route('/update', methods=['POST'])
+def update_user():
 	try:
 		_json = request.json
-		_id = id
+		_id = _json['id']
 		_name = _json['name']
 		_email = _json['email']
-		_password = _json['pwd']
+		_password = _json['pwd']		
 		# validate the received values
-		if _name and _email and _password and _id and request.method == 'PUT':
+		if _name and _email and _password and _id and request.method == 'POST':
 			#do not save password as a plain text
 			_hashed_password = generate_password_hash(_password)
 			# save edits
@@ -99,10 +94,10 @@ def update_user(id):
 	except Exception as e:
 		print(e)
 	finally:
-		cursor.close()
+		cursor.close() 
 		conn.close()
-
-@app.route('/users/<int:id>', methods=['DELETE'])
+		
+@app.route('/delete/<int:id>')
 def delete_user(id):
 	try:
 		conn = mysql.connect()
@@ -115,9 +110,9 @@ def delete_user(id):
 	except Exception as e:
 		print(e)
 	finally:
-		cursor.close()
+		cursor.close() 
 		conn.close()
-
+		
 @app.errorhandler(404)
 def not_found(error=None):
     message = {
@@ -127,7 +122,6 @@ def not_found(error=None):
     resp = jsonify(message)
     resp.status_code = 404
     return resp
-
+		
 if __name__ == "__main__":
-    #app.run()
     app.run(host='0.0.0.0')

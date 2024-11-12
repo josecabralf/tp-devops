@@ -171,6 +171,7 @@ variables:
 #       - $ARTIFACT_FILE_NAME
 
 docker-lint:
+  image: python:3.10
   stage: docker-linting
   tags:
     - $TAG

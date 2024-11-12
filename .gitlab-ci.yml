@@ -1,5 +1,5 @@
 stages:
-  - build
+  ##- build
   ##- sast-scan
   ##- code-linting
   ##- docker-linting
@@ -209,160 +209,160 @@ variables:
 #       - $ARTIFACT_FILE_NAME_NGINX
 #       - $ARTIFACT_FILE_NAME_BD
 
-dockerize-api-crud-users:
-  image: docker
-  stage: build
-  tags: [$TAG]
-  variables:
-    DOCKER_IMAGE_NAME: $CI_REGISTRY/api-crud-users-$ALUMNO:1.0.0
-    DOCKER_IMAGE_LATEST: $CI_REGISTRY/api-crud-users-$ALUMNO:latest
-    DOCKER_BUILDKIT: "1"
-    DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-    CA_CERTIFICATE: "$CA_CERTIFICATE"
-  services:
-    - name: docker:24.0.2-dind
-      alias: docker
-      command:
-      - /bin/sh
-      - -c
-      - echo "$CA_CERTIFICATE" > /usr/local/share/ca-certificates/my-ca.crt && update-ca-certificates && dockerd-entrypoint.sh || exit
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  script:
-    - docker build --pull -t "$DOCKER_IMAGE_NAME" -t "$DOCKER_IMAGE_LATEST" api/
-    - docker push "$DOCKER_IMAGE_NAME"
-    - docker push "$DOCKER_IMAGE_LATEST"
-  rules:
-    - if: $CI_COMMIT_BRANCH
-      exists:
-        - api/Dockerfile
-  allow_failure: true
+# dockerize-api-crud-users:
+#   image: docker
+#   stage: build
+#   tags: [$TAG]
+#   variables:
+#     DOCKER_IMAGE_NAME: $CI_REGISTRY/api-crud-users-$ALUMNO:1.0.0
+#     DOCKER_IMAGE_LATEST: $CI_REGISTRY/api-crud-users-$ALUMNO:latest
+#     DOCKER_BUILDKIT: "1"
+#     DOCKER_DRIVER: overlay2
+#     DOCKER_HOST: tcp://docker:2375
+#     DOCKER_TLS_CERTDIR: ""
+#     CA_CERTIFICATE: "$CA_CERTIFICATE"
+#   services:
+#     - name: docker:24.0.2-dind
+#       alias: docker
+#       command:
+#       - /bin/sh
+#       - -c
+#       - echo "$CA_CERTIFICATE" > /usr/local/share/ca-certificates/my-ca.crt && update-ca-certificates && dockerd-entrypoint.sh || exit
+#   before_script:
+#     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#   script:
+#     - docker build --pull -t "$DOCKER_IMAGE_NAME" -t "$DOCKER_IMAGE_LATEST" api/
+#     - docker push "$DOCKER_IMAGE_NAME"
+#     - docker push "$DOCKER_IMAGE_LATEST"
+#   rules:
+#     - if: $CI_COMMIT_BRANCH
+#       exists:
+#         - api/Dockerfile
+#   allow_failure: true
 
-dockerize-nginx-users:
-  image: docker
-  stage: build
-  tags: [$TAG]
-  variables:
-    DOCKER_IMAGE_NAME: $CI_REGISTRY/nginx-users-$ALUMNO:1.0.0
-    DOCKER_IMAGE_LATEST: $CI_REGISTRY/nginx-users-$ALUMNO:latest
-    DOCKER_BUILDKIT: "1"
-    DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-    CA_CERTIFICATE: "$CA_CERTIFICATE"
-  services:
-    - name: docker:24.0.2-dind
-      alias: docker
-      command:
-      - /bin/sh
-      - -c
-      - echo "$CA_CERTIFICATE" > /usr/local/share/ca-certificates/my-ca.crt && update-ca-certificates && dockerd-entrypoint.sh || exit
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  script:
-    - docker build --pull -t "$DOCKER_IMAGE_NAME" -t "$DOCKER_IMAGE_LATEST" nginx/
-    - docker push "$DOCKER_IMAGE_NAME"
-    - docker push "$DOCKER_IMAGE_LATEST"
-  rules:
-    - if: $CI_COMMIT_BRANCH
-      exists:
-        - nginx/Dockerfile
-  allow_failure: true
+# dockerize-nginx-users:
+#   image: docker
+#   stage: build
+#   tags: [$TAG]
+#   variables:
+#     DOCKER_IMAGE_NAME: $CI_REGISTRY/nginx-users-$ALUMNO:1.0.0
+#     DOCKER_IMAGE_LATEST: $CI_REGISTRY/nginx-users-$ALUMNO:latest
+#     DOCKER_BUILDKIT: "1"
+#     DOCKER_DRIVER: overlay2
+#     DOCKER_HOST: tcp://docker:2375
+#     DOCKER_TLS_CERTDIR: ""
+#     CA_CERTIFICATE: "$CA_CERTIFICATE"
+#   services:
+#     - name: docker:24.0.2-dind
+#       alias: docker
+#       command:
+#       - /bin/sh
+#       - -c
+#       - echo "$CA_CERTIFICATE" > /usr/local/share/ca-certificates/my-ca.crt && update-ca-certificates && dockerd-entrypoint.sh || exit
+#   before_script:
+#     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#   script:
+#     - docker build --pull -t "$DOCKER_IMAGE_NAME" -t "$DOCKER_IMAGE_LATEST" nginx/
+#     - docker push "$DOCKER_IMAGE_NAME"
+#     - docker push "$DOCKER_IMAGE_LATEST"
+#   rules:
+#     - if: $CI_COMMIT_BRANCH
+#       exists:
+#         - nginx/Dockerfile
+#   allow_failure: true
 
-dockerize-api-node:
-  image: docker
-  stage: build
-  tags: [$TAG]
-  variables:
-    DOCKER_IMAGE_NAME: $CI_REGISTRY/api-node-$ALUMNO:1.0.0
-    DOCKER_IMAGE_LATEST: $CI_REGISTRY/api-node-$ALUMNO:latest
-    DOCKER_BUILDKIT: "1"
-    DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-    CA_CERTIFICATE: "$CA_CERTIFICATE"
-  services:
-    - name: docker:24.0.2-dind
-      alias: docker
-      command:
-      - /bin/sh
-      - -c
-      - echo "$CA_CERTIFICATE" > /usr/local/share/ca-certificates/my-ca.crt && update-ca-certificates && dockerd-entrypoint.sh || exit
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  script:
-    - docker build --pull -t "$DOCKER_IMAGE_NAME" -t "$DOCKER_IMAGE_LATEST" api-node/
-    - docker push "$DOCKER_IMAGE_NAME"
-    - docker push "$DOCKER_IMAGE_LATEST"
-  rules:
-    - if: $CI_COMMIT_BRANCH
-      exists:
-        - api-node/Dockerfile
-  allow_failure: true
+# dockerize-api-node:
+#   image: docker
+#   stage: build
+#   tags: [$TAG]
+#   variables:
+#     DOCKER_IMAGE_NAME: $CI_REGISTRY/api-node-$ALUMNO:1.0.0
+#     DOCKER_IMAGE_LATEST: $CI_REGISTRY/api-node-$ALUMNO:latest
+#     DOCKER_BUILDKIT: "1"
+#     DOCKER_DRIVER: overlay2
+#     DOCKER_HOST: tcp://docker:2375
+#     DOCKER_TLS_CERTDIR: ""
+#     CA_CERTIFICATE: "$CA_CERTIFICATE"
+#   services:
+#     - name: docker:24.0.2-dind
+#       alias: docker
+#       command:
+#       - /bin/sh
+#       - -c
+#       - echo "$CA_CERTIFICATE" > /usr/local/share/ca-certificates/my-ca.crt && update-ca-certificates && dockerd-entrypoint.sh || exit
+#   before_script:
+#     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#   script:
+#     - docker build --pull -t "$DOCKER_IMAGE_NAME" -t "$DOCKER_IMAGE_LATEST" api-node/
+#     - docker push "$DOCKER_IMAGE_NAME"
+#     - docker push "$DOCKER_IMAGE_LATEST"
+#   rules:
+#     - if: $CI_COMMIT_BRANCH
+#       exists:
+#         - api-node/Dockerfile
+#   allow_failure: true
 
-dockerize-db-crud-users:
-  image: docker
-  stage: build
-  tags: [$TAG]
-  variables:
-    DOCKER_IMAGE_NAME: $CI_REGISTRY/db-crud-users-$ALUMNO:1.0.0
-    DOCKER_IMAGE_LATEST: $CI_REGISTRY/db-crud-users-$ALUMNO:latest
-    DOCKER_BUILDKIT: "1"
-    DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-    CA_CERTIFICATE: "$CA_CERTIFICATE"
-  services:
-    - name: docker:24.0.2-dind
-      alias: docker
-      command:
-      - /bin/sh
-      - -c
-      - echo "$CA_CERTIFICATE" > /usr/local/share/ca-certificates/my-ca.crt && update-ca-certificates && dockerd-entrypoint.sh || exit
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  script:
-    - docker build --pull -t "$DOCKER_IMAGE_NAME" -t "$DOCKER_IMAGE_LATEST" db/
-    - docker push "$DOCKER_IMAGE_NAME"
-    - docker push "$DOCKER_IMAGE_LATEST"
-  rules:
-    - if: $CI_COMMIT_BRANCH
-      exists:
-        - db/Dockerfile
-  allow_failure: true
+# dockerize-db-crud-users:
+#   image: docker
+#   stage: build
+#   tags: [$TAG]
+#   variables:
+#     DOCKER_IMAGE_NAME: $CI_REGISTRY/db-crud-users-$ALUMNO:1.0.0
+#     DOCKER_IMAGE_LATEST: $CI_REGISTRY/db-crud-users-$ALUMNO:latest
+#     DOCKER_BUILDKIT: "1"
+#     DOCKER_DRIVER: overlay2
+#     DOCKER_HOST: tcp://docker:2375
+#     DOCKER_TLS_CERTDIR: ""
+#     CA_CERTIFICATE: "$CA_CERTIFICATE"
+#   services:
+#     - name: docker:24.0.2-dind
+#       alias: docker
+#       command:
+#       - /bin/sh
+#       - -c
+#       - echo "$CA_CERTIFICATE" > /usr/local/share/ca-certificates/my-ca.crt && update-ca-certificates && dockerd-entrypoint.sh || exit
+#   before_script:
+#     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#   script:
+#     - docker build --pull -t "$DOCKER_IMAGE_NAME" -t "$DOCKER_IMAGE_LATEST" db/
+#     - docker push "$DOCKER_IMAGE_NAME"
+#     - docker push "$DOCKER_IMAGE_LATEST"
+#   rules:
+#     - if: $CI_COMMIT_BRANCH
+#       exists:
+#         - db/Dockerfile
+#   allow_failure: true
 
-dockerize-react-front:
-  image: docker
-  stage: build
-  tags: [$TAG]
-  variables:
-    DOCKER_IMAGE_NAME: $CI_REGISTRY/react-front-$ALUMNO:1.0.0
-    DOCKER_IMAGE_LATEST: $CI_REGISTRY/react-front-$ALUMNO:latest
-    DOCKER_BUILDKIT: "1"
-    DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-    CA_CERTIFICATE: "$CA_CERTIFICATE"
-  services:
-    - name: docker:24.0.2-dind
-      alias: docker
-      command:
-      - /bin/sh
-      - -c
-      - echo "$CA_CERTIFICATE" > /usr/local/share/ca-certificates/my-ca.crt && update-ca-certificates && dockerd-entrypoint.sh || exit
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  script:
-    - docker build --pull -t "$DOCKER_IMAGE_NAME" -t "$DOCKER_IMAGE_LATEST" web/
-    - docker push "$DOCKER_IMAGE_NAME"
-    - docker push "$DOCKER_IMAGE_LATEST"
-  rules:
-    - if: $CI_COMMIT_BRANCH
-      exists:
-        - web/Dockerfile
-  allow_failure: true
+# dockerize-react-front:
+#   image: docker
+#   stage: build
+#   tags: [$TAG]
+#   variables:
+#     DOCKER_IMAGE_NAME: $CI_REGISTRY/react-front-$ALUMNO:1.0.0
+#     DOCKER_IMAGE_LATEST: $CI_REGISTRY/react-front-$ALUMNO:latest
+#     DOCKER_BUILDKIT: "1"
+#     DOCKER_DRIVER: overlay2
+#     DOCKER_HOST: tcp://docker:2375
+#     DOCKER_TLS_CERTDIR: ""
+#     CA_CERTIFICATE: "$CA_CERTIFICATE"
+#   services:
+#     - name: docker:24.0.2-dind
+#       alias: docker
+#       command:
+#       - /bin/sh
+#       - -c
+#       - echo "$CA_CERTIFICATE" > /usr/local/share/ca-certificates/my-ca.crt && update-ca-certificates && dockerd-entrypoint.sh || exit
+#   before_script:
+#     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#   script:
+#     - docker build --pull -t "$DOCKER_IMAGE_NAME" -t "$DOCKER_IMAGE_LATEST" web/
+#     - docker push "$DOCKER_IMAGE_NAME"
+#     - docker push "$DOCKER_IMAGE_LATEST"
+#   rules:
+#     - if: $CI_COMMIT_BRANCH
+#       exists:
+#         - web/Dockerfile
+#   allow_failure: true
 
 deployment:
   stage: deploy
@@ -398,14 +398,6 @@ healthcheck:
     PATH_HEALTHCHECK_SCRIPT: ./scripts/healthcheck.sh
     PATH_SERVER_USR: devops
     HEALTHCHECK_OUTPUT: healthcheck.log
-  before_script:
-    - 'which ssh-agent || ( apk update && apk add openssh-client)'
-    - eval $(ssh-agent -s)
-    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - mkdir -p /usr/local/share/ca-certificates || exit
-    - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
   script:
     - scp $PATH_HEALTHCHECK_SCRIPT $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "chmod +x $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/healthcheck.sh"

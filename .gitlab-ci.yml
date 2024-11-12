@@ -1,174 +1,176 @@
 stages:
-  # - sast-scan
-  # - code-linting
+  - sast-scan
+  - code-linting
   - docker-linting
+  - deploy
 
 variables:
   ALUMNO: 85505-85829-92425
   TAG: devops-runner
+  DOCKER_NETWORK: devops-network
 
-# secrets-scan:
-#   stage: sast-scan
-#   image: python:3.10
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: secrets-scan.txt
-#   before_script:
-#     - pip install detect-secrets
-#   script:
-#     - detect-secrets scan . --all-files --exclude-files venv/ --exclude-files node_modules > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+secrets-scan:
+  stage: sast-scan
+  image: python:3.10
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: secrets-scan.txt
+  before_script:
+    - pip install detect-secrets
+  script:
+    - detect-secrets scan . --all-files --exclude-files venv/ --exclude-files node_modules > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
 
-# sast-scan-python:
-#   image: python:3.10
-#   stage: sast-scan
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: python-secrets-scan-$ALUMNO.txt
-#   script:
-#     - python3 -m venv venv
-#     - source venv/bin/activate
-#     - pip install bandit
-#     - chmod 700 run_bandit.sh
-#     - ./run_bandit.sh > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+sast-scan-python:
+  image: python:3.10
+  stage: sast-scan
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: python-secrets-scan-$ALUMNO.txt
+  script:
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install bandit
+    - chmod 700 run_bandit.sh
+    - ./run_bandit.sh > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
 
-# sca-scan-python:
-#   image: python:3.10
-#   stage: sast-scan
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: python-safety-scan-$ALUMNO.txt
-#   script:
-#     - python3 -m venv venv
-#     - source venv/bin/activate
-#     - pip install safety
-#     - chmod 700 run_safety.sh
-#     - ./run_safety.sh > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+sca-scan-python:
+  image: python:3.10
+  stage: sast-scan
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: python-safety-scan-$ALUMNO.txt
+  script:
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install safety
+    - chmod 700 run_safety.sh
+    - ./run_safety.sh > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
 
-# sast-scan-js:
-#   stage: sast-scan
-#   image: python:3.10
-#   variables:
-#     ARTIFACT_FILE_NAME_NODE: njsscan_report_node.txt
-#     ARTIFACT_FILE_NAME_REACT: njsscan_report_react.txt
-#   tags:
-#     - $TAG
-#   script:
-#     - python3 -m venv venv
-#     - source venv/bin/activate
-#     - pip install njsscan
-#     - chmod 700 run_njsscan.sh
-#     - ./run_njsscan.sh api-node > $ARTIFACT_FILE_NAME_NODE
-#     - ./run_njsscan.sh web > $ARTIFACT_FILE_NAME_REACT
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME_NODE
-#       - $ARTIFACT_FILE_NAME_REACT
+sast-scan-js:
+  stage: sast-scan
+  image: python:3.10
+  variables:
+    ARTIFACT_FILE_NAME_NODE: njsscan_report_node.txt
+    ARTIFACT_FILE_NAME_REACT: njsscan_report_react.txt
+  tags:
+    - $TAG
+  script:
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install njsscan
+    - chmod 700 run_njsscan.sh
+    - ./run_njsscan.sh api-node > $ARTIFACT_FILE_NAME_NODE
+    - ./run_njsscan.sh web > $ARTIFACT_FILE_NAME_REACT
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME_NODE
+      - $ARTIFACT_FILE_NAME_REACT
 
-# sca-scan-js:
-#   stage: sast-scan
-#   image: docker
-#   tags:
-#     - $TAG
-#   variables:
-#     PATH_SERVER_USR: devops
-#     DOCKER_IMAGE_NAME: $CI_REGISTRY/api-$ALUMNO:1.0.0
-#     DOCKER_BUILDKIT: "1"
-#     DOCKER_DRIVER: overlay2
-#     DOCKER_HOST: tcp://docker:2375
-#     DOCKER_TLS_CERTDIR: ""
-#     CA_CERTIFICATE: "$CA_CERTIFICATE"
-#     ARTIFACT_FILE_NAME_NODE: sca-scan-node-$ALUMNO.txt
-#     ARTIFACT_FILE_NAME_REACT: sca-scan-react-$ALUMNO.txt
-#     VOLUME_NAME: sca
-#   before_script:
-#     - 'which ssh-agent || ( apk update && apk add openssh-client)'
-#     - eval $(ssh-agent -s)
-#     - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
-#     - mkdir -p ~/.ssh
-#     - chmod 700 ~/.ssh
-#     - mkdir -p  /usr/local/share/ca-certificates || exit
-#     - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
-#   script:
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker pull gruebel/retirejs:latest"
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p /tmp/escaneo/$ALUMNO"
-#     - scp -r ./api-node $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO
-#     - scp -r ./web $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO
-#     - scp run_retire.sh $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "chmod 700 /tmp/escaneo/$ALUMNO/run_retire.sh"
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "/tmp/escaneo/$ALUMNO/run_retire.sh /tmp/escaneo/$ALUMNO/api-node $ARTIFACT_FILE_NAME_NODE"
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "/tmp/escaneo/$ALUMNO/run_retire.sh /tmp/escaneo/$ALUMNO/web $ARTIFACT_FILE_NAME_REACT"
-#     - scp $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO/api-node/$ARTIFACT_FILE_NAME_NODE ./$ARTIFACT_FILE_NAME_NODE
-#     - scp $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO/web/$ARTIFACT_FILE_NAME_REACT ./$ARTIFACT_FILE_NAME_REACT
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME_NODE
-#       - $ARTIFACT_FILE_NAME_REACT
+sca-scan-js:
+  stage: sast-scan
+  image: docker
+  tags:
+    - $TAG
+  variables:
+    PATH_SERVER_USR: devops
+    DOCKER_IMAGE_NAME: $CI_REGISTRY/api-$ALUMNO:1.0.0
+    DOCKER_BUILDKIT: "1"
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    CA_CERTIFICATE: "$CA_CERTIFICATE"
+    ARTIFACT_FILE_NAME_NODE: sca-scan-node-$ALUMNO.txt
+    ARTIFACT_FILE_NAME_REACT: sca-scan-react-$ALUMNO.txt
+    VOLUME_NAME: sca
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - mkdir -p  /usr/local/share/ca-certificates || exit
+    - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
+  script:
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker pull gruebel/retirejs:latest"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p /tmp/escaneo/$ALUMNO"
+    - scp -r ./api-node $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO
+    - scp -r ./web $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO
+    - scp run_retire.sh $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "chmod 700 /tmp/escaneo/$ALUMNO/run_retire.sh"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "/tmp/escaneo/$ALUMNO/run_retire.sh /tmp/escaneo/$ALUMNO/api-node $ARTIFACT_FILE_NAME_NODE"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "/tmp/escaneo/$ALUMNO/run_retire.sh /tmp/escaneo/$ALUMNO/web $ARTIFACT_FILE_NAME_REACT"
+    - scp $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO/api-node/$ARTIFACT_FILE_NAME_NODE ./$ARTIFACT_FILE_NAME_NODE
+    - scp $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO/web/$ARTIFACT_FILE_NAME_REACT ./$ARTIFACT_FILE_NAME_REACT
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME_NODE
+      - $ARTIFACT_FILE_NAME_REACT
 
-# code-lint-python:
-#   image: python:3.10
-#   stage: code-linting
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: python-code-linting-$ALUMNO.txt
-#   script:
-#     - python3 -m venv venv
-#     - pip install --upgrade pip
-#     - source venv/bin/activate
-#     - pip install pylint
-#     - chmod 700 ./run_pylint.sh
-#     - ./run_pylint.sh > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+code-lint-python:
+  image: python:3.10
+  stage: code-linting
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: python-code-linting-$ALUMNO.txt
+  script:
+    - python3 -m venv venv
+    - pip install --upgrade pip
+    - source venv/bin/activate
+    - pip install pylint
+    - chmod 700 ./run_pylint.sh
+    - ./run_pylint.sh > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
 
-# code-lint-node:
-#   image: node:18
-#   stage: code-linting
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: node-api-linting-$ALUMNO.txt
-#   script:
-#     - cd api-node
-#     - npm install
-#     - npm install eslint --save-dev
-#     - cd ..
-#     - chmod 700 ./run_eslint.sh
-#     - ./run_eslint.sh api-node > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+code-lint-node:
+  image: node:18
+  stage: code-linting
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: node-api-linting-$ALUMNO.txt
+  script:
+    - cd api-node
+    - npm install
+    - npm install eslint --save-dev
+    - cd ..
+    - chmod 700 ./run_eslint.sh
+    - ./run_eslint.sh api-node > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
 
-# code-lint-react:
-#   image: node:18
-#   stage: code-linting
-#   tags:
-#     - $TAG
-#   variables:
-#     ARTIFACT_FILE_NAME: web-linting-$ALUMNO.txt
-#   script:
-#     - cd web
-#     - npm install
-#     - npm install eslint --save-dev
-#     - cd ..
-#     - chmod 700 ./run_eslint.sh
-#     - ./run_eslint.sh web > $ARTIFACT_FILE_NAME
-#   artifacts:
-#     paths:
-#       - $ARTIFACT_FILE_NAME
+code-lint-react:
+  image: node:18
+  stage: code-linting
+  tags:
+    - $TAG
+  variables:
+    ARTIFACT_FILE_NAME: web-linting-$ALUMNO.txt
+  script:
+    - cd web
+    - npm install
+    - npm install eslint --save-dev
+    - cd ..
+    - chmod 700 ./run_eslint.sh
+    - ./run_eslint.sh web > $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
 
 docker-lint:
   image: python:3.10
@@ -203,3 +205,28 @@ docker-lint:
       - $ARTIFACT_FILE_NAME_REACT
       - $ARTIFACT_FILE_NAME_NGINX
       - $ARTIFACT_FILE_NAME_BD
+
+deployment:
+  stage: deploy
+  image: alpine:3.18.4
+  tags: [$TAG]
+  variables:
+    PATH_SERVER_USR: devops
+    PATH_COMPOSE: ./docker-compose.yml
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - mkdir -p  /usr/local/share/ca-certificates || exit
+    - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
+  script:
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker network create $DOCKER_NETWORK || true"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/data"
+    - scp $PATH_COMPOSE $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin  $CI_REGISTRY "
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker compose down --rmi all"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker compose up -d"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker ps"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE ""

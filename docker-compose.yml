@@ -1,39 +1,54 @@
 version: '3.8'
 
 services:
-  db:
-    build:
-      context: ./db
-      dockerfile: Dockerfile
-    image: bd-crud-users:latest
-    container_name: db-crud-users
+
+  nginx-users:
+    build: nginx/
+    ports:
+      - "8080:80"
+    networks:
+      - crud-users-net
+    restart: always
+    links:
+      - api-crud-users:api-crud-users
+
+  api-crud-users:
+    build: api/
+    networks:
+      - crud-users-net
+    depends_on:
+      - db-crud-users
+    links:
+      - "db-crud-users:db-crud-users"
+
+  api-node:
+    build: api-node/
+    networks:
+      - crud-users-net
+
+  db-crud-users:
+    build: db/
+    restart: always
+    networks:
+      - crud-users-net
+    volumes:
+      - db-crud-users-data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: r00t
       MYSQL_DATABASE: utn
       MYSQL_USER: testuser
       MYSQL_PASSWORD: testpass
-    volumes:
-      - db-crud-users-data:/var/lib/mysql
-    networks:
-      - crud-users-net
-    restart: always
 
-  api:
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-    image: api-crud-users:latest
-    container_name: api-crud-users
+  react-front:
+    build: web/
+    networks:
+      - front-net
     ports:
-      - "5000:5000"
-    networks:
-      - crud-users-net
-    restart: always
-
-networks:
-  crud-users-net:
-    driver: bridge
+      - "3000:80"
 
 volumes:
   db-crud-users-data:
-    driver: local
+
+networks:
+  crud-users-net:
+  front-net:

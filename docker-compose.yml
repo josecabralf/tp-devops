@@ -53,7 +53,7 @@ services:
       - "3000:80"
 
 volumes:
-  db-crud-users-data:
+  data:
 
 networks:
   crud-users-net:

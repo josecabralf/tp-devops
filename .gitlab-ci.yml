@@ -4,6 +4,7 @@ stages:
   ##- code-linting
   ##- docker-linting
   - deploy
+  - healthcheck
 
 variables:
   ALUMNO: 85505-85829-92425
@@ -388,3 +389,28 @@ deployment:
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker compose down --rmi all"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker compose up -d"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker ps"
+
+healthcheck:
+  stage: healthcheck
+  image: alpine:3.18.4
+  tags: [$TAG]
+  variables:
+    PATH_HEALTHCHECK_SCRIPT: ./scripts/healthcheck.sh
+    PATH_SERVER_USR: devops
+    HEALTHCHECK_OUTPUT: healthcheck.log
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - mkdir -p /usr/local/share/ca-certificates || exit
+    - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
+  script:
+    - scp $PATH_HEALTHCHECK_SCRIPT $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "chmod +x $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/healthcheck.sh"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && bash ./healthcheck.sh > $HEALTHCHECK_OUTPUT"
+    - scp $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/$HEALTHCHECK_OUTPUT .
+  artifacts:
+    paths:
+      - $HEALTHCHECK_OUTPUT

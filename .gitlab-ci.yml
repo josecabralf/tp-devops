@@ -173,39 +173,39 @@ variables:
 #     paths:
 #       - $ARTIFACT_FILE_NAME
 
-# docker-lint:
-  image: python:3.10
-  stage: docker-linting
-  tags:
-    - $TAG
-  variables:
-    ARTIFACT_FILE_NAME_PYTHON: python-docker-linting-$ALUMNO.txt
-    ARTIFACT_FILE_NAME_NODE: node-docker-linting-$ALUMNO.txt
-    ARTIFACT_FILE_NAME_REACT: react-docker-linting-$ALUMNO.txt
-    ARTIFACT_FILE_NAME_NGINX: nginx-docker-linting-$ALUMNO.txt
-    ARTIFACT_FILE_NAME_BD: bd-docker-linting-$ALUMNO.txt
-    SCAN_PYTHON: api
-    SCAN_NODE: api-node
-    SCAN_REACT: web
-    SCAN_NGINX: nginx
-    SCAN_BD: db
-  script:
-    - python3 -m venv venv
-    - source venv/bin/activate
-    - pip install checkov
-    - chmod 700 ./scripts/run_checkov.sh
-    - ./scripts/run_checkov.sh $SCAN_PYTHON > $ARTIFACT_FILE_NAME_PYTHON
-    - ./scripts/run_checkov.sh $SCAN_NODE > $ARTIFACT_FILE_NAME_NODE
-    - ./scripts/run_checkov.sh $SCAN_REACT > $ARTIFACT_FILE_NAME_REACT
-    - ./scripts/run_checkov.sh $SCAN_NGINX > $ARTIFACT_FILE_NAME_NGINX
-    - ./scripts/run_checkov.sh $SCAN_BD > $ARTIFACT_FILE_NAME_BD
-  artifacts:
-    paths:
-      - $ARTIFACT_FILE_NAME_PYTHON
-      - $ARTIFACT_FILE_NAME_NODE
-      - $ARTIFACT_FILE_NAME_REACT
-      - $ARTIFACT_FILE_NAME_NGINX
-      - $ARTIFACT_FILE_NAME_BD
+# # docker-lint:
+#   image: python:3.10
+#   stage: docker-linting
+#   tags:
+#     - $TAG
+#   variables:
+#     ARTIFACT_FILE_NAME_PYTHON: python-docker-linting-$ALUMNO.txt
+#     ARTIFACT_FILE_NAME_NODE: node-docker-linting-$ALUMNO.txt
+#     ARTIFACT_FILE_NAME_REACT: react-docker-linting-$ALUMNO.txt
+#     ARTIFACT_FILE_NAME_NGINX: nginx-docker-linting-$ALUMNO.txt
+#     ARTIFACT_FILE_NAME_BD: bd-docker-linting-$ALUMNO.txt
+#     SCAN_PYTHON: api
+#     SCAN_NODE: api-node
+#     SCAN_REACT: web
+#     SCAN_NGINX: nginx
+#     SCAN_BD: db
+#   script:
+#     - python3 -m venv venv
+#     - source venv/bin/activate
+#     - pip install checkov
+#     - chmod 700 ./scripts/run_checkov.sh
+#     - ./scripts/run_checkov.sh $SCAN_PYTHON > $ARTIFACT_FILE_NAME_PYTHON
+#     - ./scripts/run_checkov.sh $SCAN_NODE > $ARTIFACT_FILE_NAME_NODE
+#     - ./scripts/run_checkov.sh $SCAN_REACT > $ARTIFACT_FILE_NAME_REACT
+#     - ./scripts/run_checkov.sh $SCAN_NGINX > $ARTIFACT_FILE_NAME_NGINX
+#     - ./scripts/run_checkov.sh $SCAN_BD > $ARTIFACT_FILE_NAME_BD
+#   artifacts:
+#     paths:
+#       - $ARTIFACT_FILE_NAME_PYTHON
+#       - $ARTIFACT_FILE_NAME_NODE
+#       - $ARTIFACT_FILE_NAME_REACT
+#       - $ARTIFACT_FILE_NAME_NGINX
+#       - $ARTIFACT_FILE_NAME_BD
 
 deployment:
   stage: deploy

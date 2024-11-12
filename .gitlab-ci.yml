@@ -198,4 +198,8 @@ docker-lint:
     - ./run_checkov.sh $SCAN_BD > $ARTIFACT_FILE_NAME_BD
   artifacts:
     paths:
-      - $ARTIFACT_FILE_NAME
+      - $ARTIFACT_FILE_NAME_PYTHON
+      - $ARTIFACT_FILE_NAME_NODE
+      - $ARTIFACT_FILE_NAME_REACT
+      - $ARTIFACT_FILE_NAME_NGINX
+      - $ARTIFACT_FILE_NAME_BD

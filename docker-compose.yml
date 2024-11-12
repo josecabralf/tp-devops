@@ -4,7 +4,7 @@ name: 12-docker-compose
 services:
 
   nginx-users:
-    image: $CI_REGISTRY/nginx-users-$ALUMNO:latest
+    image: registry-alumnos.labsis.frc.utn.edu.ar:8443/nginx-users-85505-85829-92425:latest
     build: nginx/
     ports:
       - "8080:80"
@@ -15,7 +15,7 @@ services:
       - api-crud-users:api-crud-users
 
   api-crud-users:
-    image: $CI_REGISTRY/api-crud-users-$ALUMNO:latest
+    image: registry-alumnos.labsis.frc.utn.edu.ar:8443/api-crud-users-85505-85829-92425:latest
     build: api/
     networks:
       - crud-users-net
@@ -30,13 +30,13 @@ services:
       - "db-crud-users:db-crud-users"
 
   api-node:
-    image: $CI_REGISTRY/api-node-$ALUMNO:latest
+    image: registry-alumnos.labsis.frc.utn.edu.ar:8443/api-node-85505-85829-92425:latest
     build: api-node/
     networks:
       - crud-users-net
 
   db-crud-users:
-    image: $CI_REGISTRY/db-crud-users-$ALUMNO:latest
+    image: registry-alumnos.labsis.frc.utn.edu.ar:8443/db-crud-users-85505-85829-92425:latest
     build: db/
     restart: always
     networks:
@@ -50,7 +50,7 @@ services:
       MYSQL_PASSWORD: testpass
 
   react-front:
-    image: $CI_REGISTRY/react-front-$ALUMNO:latest
+    image: registry-alumnos.labsis.frc.utn.edu.ar:8443/react-front-85505-85829-92425:latest
     build: web/
     networks:
       - front-net

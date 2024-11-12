@@ -33,8 +33,8 @@ sast-scan-python:
     - python3 -m venv venv
     - source venv/bin/activate
     - pip install bandit
-    - chmod 700 run_bandit.sh
-    - ./run_bandit.sh > $ARTIFACT_FILE_NAME
+    - chmod 700 ./script/run_bandit.sh
+    - ./script/run_bandit.sh > $ARTIFACT_FILE_NAME
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME
@@ -50,8 +50,8 @@ sca-scan-python:
     - python3 -m venv venv
     - source venv/bin/activate
     - pip install safety
-    - chmod 700 run_safety.sh
-    - ./run_safety.sh > $ARTIFACT_FILE_NAME
+    - chmod 700 ./script/run_safety.sh
+    - ./script/run_safety.sh > $ARTIFACT_FILE_NAME
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME
@@ -68,9 +68,9 @@ sast-scan-js:
     - python3 -m venv venv
     - source venv/bin/activate
     - pip install njsscan
-    - chmod 700 run_njsscan.sh
-    - ./run_njsscan.sh api-node > $ARTIFACT_FILE_NAME_NODE
-    - ./run_njsscan.sh web > $ARTIFACT_FILE_NAME_REACT
+    - chmod 700 ./script/run_njsscan.sh
+    - ./script/run_njsscan.sh api-node > $ARTIFACT_FILE_NAME_NODE
+    - ./script/run_njsscan.sh web > $ARTIFACT_FILE_NAME_REACT
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME_NODE
@@ -128,8 +128,8 @@ code-lint-python:
     - pip install --upgrade pip
     - source venv/bin/activate
     - pip install pylint
-    - chmod 700 ./run_pylint.sh
-    - ./run_pylint.sh > $ARTIFACT_FILE_NAME
+    - chmod 700 ./script/run_pylint.sh
+    - ./script/run_pylint.sh > $ARTIFACT_FILE_NAME
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME
@@ -146,8 +146,8 @@ code-lint-node:
     - npm install
     - npm install eslint --save-dev
     - cd ..
-    - chmod 700 ./run_eslint.sh
-    - ./run_eslint.sh api-node > $ARTIFACT_FILE_NAME
+    - chmod 700 ./script/run_eslint.sh
+    - ./script/run_eslint.sh api-node > $ARTIFACT_FILE_NAME
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME
@@ -164,8 +164,8 @@ code-lint-react:
     - npm install
     - npm install eslint --save-dev
     - cd ..
-    - chmod 700 ./run_eslint.sh
-    - ./run_eslint.sh web > $ARTIFACT_FILE_NAME
+    - chmod 700 ./script/run_eslint.sh
+    - ./script/run_eslint.sh web > $ARTIFACT_FILE_NAME
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME
@@ -190,12 +190,12 @@ docker-lint:
     - python3 -m venv venv
     - source venv/bin/activate
     - pip install checkov
-    - chmod 700 run_checkov.sh
-    - ./run_checkov.sh $SCAN_PYTHON > $ARTIFACT_FILE_NAME_PYTHON
-    - ./run_checkov.sh $SCAN_NODE > $ARTIFACT_FILE_NAME_NODE
-    - ./run_checkov.sh $SCAN_REACT > $ARTIFACT_FILE_NAME_REACT
-    - ./run_checkov.sh $SCAN_NGINX > $ARTIFACT_FILE_NAME_NGINX
-    - ./run_checkov.sh $SCAN_BD > $ARTIFACT_FILE_NAME_BD
+    - chmod 700 ./script/run_checkov.sh
+    - ./script/run_checkov.sh $SCAN_PYTHON > $ARTIFACT_FILE_NAME_PYTHON
+    - ./script/run_checkov.sh $SCAN_NODE > $ARTIFACT_FILE_NAME_NODE
+    - ./script/run_checkov.sh $SCAN_REACT > $ARTIFACT_FILE_NAME_REACT
+    - ./script/run_checkov.sh $SCAN_NGINX > $ARTIFACT_FILE_NAME_NGINX
+    - ./script/run_checkov.sh $SCAN_BD > $ARTIFACT_FILE_NAME_BD
   artifacts:
     paths:
       - $ARTIFACT_FILE_NAME_PYTHON

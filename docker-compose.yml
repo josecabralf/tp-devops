@@ -4,6 +4,7 @@ name: 12-docker-compose
 services:
 
   nginx-users:
+    image: $CI_REGISTRY/nginx-users-$ALUMNO:latest
     build: nginx/
     ports:
       - "8080:80"
@@ -14,6 +15,7 @@ services:
       - api-crud-users:api-crud-users
 
   api-crud-users:
+    image: $CI_REGISTRY/api-crud-users-$ALUMNO:latest
     build: api/
     networks:
       - crud-users-net
@@ -28,11 +30,13 @@ services:
       - "db-crud-users:db-crud-users"
 
   api-node:
+    image: $CI_REGISTRY/api-node-$ALUMNO:latest
     build: api-node/
     networks:
       - crud-users-net
 
   db-crud-users:
+    image: $CI_REGISTRY/db-crud-users-$ALUMNO:latest
     build: db/
     restart: always
     networks:
@@ -46,6 +50,7 @@ services:
       MYSQL_PASSWORD: testpass
 
   react-front:
+    image: $CI_REGISTRY/react-front-$ALUMNO:latest
     build: web/
     networks:
       - front-net

@@ -38,7 +38,7 @@ services:
     networks:
       - crud-users-net
     volumes:
-      - db-crud-users-data:/var/lib/mysql
+      - data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: r00t
       MYSQL_DATABASE: utn

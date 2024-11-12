@@ -20,7 +20,7 @@ curl -X GET http://127.0.0.1:8080/api/users >> $OUTPUT_FILE 2>&1
 
 echo "API-NODE" >> $OUTPUT_FILE
 
-echo "Realizando GET a /api/hello-world" >> $OUTPUT_FILE
+echo "Realizando GET a /api-node/hello-world" >> $OUTPUT_FILE
 curl -X GET http://127.0.0.1:8080/api-node/hello-world >> $OUTPUT_FILE 2>&1
 
 

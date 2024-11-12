@@ -2,10 +2,13 @@ stages:
   - sast-scan
   - code-linting
   - docker-linting
+  - deploy
 
 variables:
   ALUMNO: 85505-85829-92425
   TAG: devops-runner
+  DOCKER_BACK_NETWORK: devops-back-network
+  DOCKER_FRONT_NETWORK: devops-front-network
 
 secrets-scan:
   stage: sast-scan
@@ -203,3 +206,28 @@ docker-lint:
       - $ARTIFACT_FILE_NAME_REACT
       - $ARTIFACT_FILE_NAME_NGINX
       - $ARTIFACT_FILE_NAME_BD
+
+deployment:
+  stage: deploy
+  image: alpine:3.18.4
+  tags: [$TAG]
+  variables:
+    PATH_SERVER_USR: devops
+    PATH_RUN: ./build_run.sh
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - mkdir -p  /usr/local/share/ca-certificates || exit
+    - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
+  script:
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker network create $DOCKER_BACK_NETWORK || true"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker network create $DOCKER_FRONT_NETWORK || true"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/data"
+    - scp $PATH_RUN $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin  $CI_REGISTRY "
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && $PATH_RUN $DOCKER_BACK_NETWORK $DOCKER_FRONT_NETWORK"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker ps"

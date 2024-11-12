@@ -7,6 +7,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 		
 @app.route('/add', methods=['POST'])
 def add_user():
+	conn = None
+	cursor = None
 	try:
 		_json = request.json
 		_name = _json['name']
@@ -23,6 +25,8 @@ def add_user():
 			cursor = conn.cursor()
 			cursor.execute(sql, data)
 			conn.commit()
+			cursor.close() 
+			conn.close()
 			resp = jsonify('User added successfully!')
 			resp.status_code = 200
 			return resp
@@ -30,9 +34,6 @@ def add_user():
 			return not_found()
 	except Exception as e:
 		print(e)
-	finally:
-		cursor.close() 
-		conn.close()
 		
 @app.route('/users')
 def users():
@@ -43,14 +44,13 @@ def users():
 		cursor = conn.cursor(pymysql.cursors.DictCursor)
 		cursor.execute("SELECT * FROM tbl_user")
 		rows = cursor.fetchall()
+		cursor.close() 
+		conn.close()
 		resp = jsonify(rows)
 		resp.status_code = 200
 		return resp
 	except Exception as e:
 		print(e)
-	finally:
-		cursor.close() 
-		conn.close()
 		
 @app.route('/user/<int:id>')
 def user(id):

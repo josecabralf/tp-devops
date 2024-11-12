@@ -105,7 +105,7 @@ sca-scan-js:
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p /tmp/escaneo/$ALUMNO"
     - scp -r ./api-node $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO
     - scp -r ./web $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO
-    - scp run_retire.sh $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO
+    - scp ./scripts/run_retire.sh $SERVER_USR@$SERVER_INSTANCE:/tmp/escaneo/$ALUMNO
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "chmod 700 /tmp/escaneo/$ALUMNO/run_retire.sh"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "/tmp/escaneo/$ALUMNO/run_retire.sh /tmp/escaneo/$ALUMNO/api-node $ARTIFACT_FILE_NAME_NODE"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "/tmp/escaneo/$ALUMNO/run_retire.sh /tmp/escaneo/$ALUMNO/web $ARTIFACT_FILE_NAME_REACT"

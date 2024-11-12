@@ -18,6 +18,11 @@ services:
       - crud-users-net
     depends_on: 
       - db-crud-users
+    environment:
+      - MYSQL_DATABASE_USER=testuser
+      - MYSQL_DATABASE_PASSWORD=testpass
+      - MYSQL_DATABASE_DB=utn
+      - MYSQL_DATABASE_HOST=db-crud-users
     links:
       - "db-crud-users:db-crud-users"
 

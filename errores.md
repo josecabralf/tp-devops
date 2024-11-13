@@ -23,4 +23,8 @@ Fuimos distraidos y no tuvimos en cuenta el host que apunte al contenedor de la 
 
 Sin problemas, pudimos trabajar con lo aprendido.
 
+### ETAPA: IMAGE SCAN
+
+Sin problemas.
+
 ### ETAPA: DEPLOY

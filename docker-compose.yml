@@ -2,45 +2,49 @@ version: '3'
 name: 12-docker-compose
 
 services:
-
+  
   nginx-users:
     image: registry-alumnos.labsis.frc.utn.edu.ar:8443/nginx-users-85505-85829-92425:latest
     build: nginx/
+    container_name: ${NGINX_CONTAINER_NAME}
     ports:
       - "8080:80"
     networks:
-      - crud-users-net
+      - ${CRUD_USERS_NET}
     restart: always
     links:
-      - api-crud-users:api-crud-users
+      - ${API_CRUD_CONTAINER_NAME}:${API_CRUD_CONTAINER_NAME}
 
   api-crud-users:
     image: registry-alumnos.labsis.frc.utn.edu.ar:8443/api-crud-users-85505-85829-92425:latest
     build: api/
+    container_name: ${API_CRUD_CONTAINER_NAME}
     networks:
-      - crud-users-net
+      - ${CRUD_USERS_NET}
     depends_on: 
-      - db-crud-users
+      - ${DB_CRUD_CONTAINER_NAME}
     environment:
       - MYSQL_DATABASE_USER=${MYSQL_USER}
       - MYSQL_DATABASE_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_DATABASE_DB=${MYSQL_DATABASE}
-      - MYSQL_DATABASE_HOST=db-crud-users
+      - MYSQL_DATABASE_HOST=${DB_CRUD_CONTAINER_NAME}
     links:
-      - "db-crud-users:db-crud-users"
+      - "${DB_CRUD_CONTAINER_NAME}:${DB_CRUD_CONTAINER_NAME}"
 
   api-node:
     image: registry-alumnos.labsis.frc.utn.edu.ar:8443/api-node-85505-85829-92425:latest
     build: api-node/
+    container_name: ${API_NODE_CONTAINER_NAME}
     networks:
-      - crud-users-net
+      - ${CRUD_USERS_NET}
 
   db-crud-users:
     image: registry-alumnos.labsis.frc.utn.edu.ar:8443/db-crud-users-85505-85829-92425:latest
     build: db/
+    container_name: ${DB_CRUD_CONTAINER_NAME}
     restart: always
     networks:
-      - crud-users-net
+      - ${CRUD_USERS_NET}
     volumes:
       - data:/var/lib/mysql
     environment:
@@ -52,8 +56,9 @@ services:
   react-front:
     image: registry-alumnos.labsis.frc.utn.edu.ar:8443/react-front-85505-85829-92425:latest
     build: web/
+    container_name: ${REACT_FRONT_CONTAINER_NAME}
     networks:
-      - front-net
+      - ${FRONT_NET}
     ports:
       - "3000:80"
 

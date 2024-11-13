@@ -22,9 +22,9 @@ services:
     depends_on: 
       - db-crud-users
     environment:
-      - MYSQL_DATABASE_USER=testuser
-      - MYSQL_DATABASE_PASSWORD=testpass
-      - MYSQL_DATABASE_DB=utn
+      - MYSQL_DATABASE_USER=${MYSQL_USER}
+      - MYSQL_DATABASE_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE_DB=${MYSQL_DATABASE}
       - MYSQL_DATABASE_HOST=db-crud-users
     links:
       - "db-crud-users:db-crud-users"
@@ -44,10 +44,10 @@ services:
     volumes:
       - data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: r00t
-      MYSQL_DATABASE: utn
-      MYSQL_USER: testuser
-      MYSQL_PASSWORD: testpass
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
   react-front:
     image: registry-alumnos.labsis.frc.utn.edu.ar:8443/react-front-85505-85829-92425:latest

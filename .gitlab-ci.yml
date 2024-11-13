@@ -400,7 +400,7 @@ dockerize-nginx-users:
 
 scan-nginx-image:
   image: docker
-  stage: scan
+  stage: image-scan
   tags: [$TAG]
   variables:
     PATH_SERVER_USR: devops

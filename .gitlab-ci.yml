@@ -541,23 +541,13 @@ deployment:
     - mkdir -p  /usr/local/share/ca-certificates || exit
     - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
   script:
-    - echo "NGINX_CONTAINER_NAME=$NGINX_CONTAINER_NAME" >> .env
-    - echo "API_CRUD_CONTAINER_NAME=$API_CRUD_CONTAINER_NAME" >> .env
-    - echo "DB_CRUD_CONTAINER_NAME=$DB_CRUD_CONTAINER_NAME" >> .env
-    - echo "MYSQL_USER=$MYSQL_USER" >> .env
-    - echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> .env
-    - echo "MYSQL_DATABASE=$MYSQL_DATABASE" >> .env
-    - echo "API_NODE_CONTAINER_NAME=$API_NODE_CONTAINER_NAME" >> .env
-    - echo "CRUD_USERS_NET=$CRUD_USERS_NET" >> .env
-    - echo "REACT_FRONT_CONTAINER_NAME=$REACT_FRONT_CONTAINER_NAME" >> .env
-    - echo "FRONT_NET=$FRONT_NET" >> .env
-    - scp .env $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker network create $DOCKER_BACK_NETWORK || true"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker network create $DOCKER_FRONT_NETWORK || true"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "rm -r $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO || true"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/data"
     - scp $PATH_COMPOSE $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin  $CI_REGISTRY "
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "export NGINX_CONTAINER_NAME=$NGINX_CONTAINER_NAME API_CRUD_CONTAINER_NAME=$API_CRUD_CONTAINER_NAME DB_CRUD_CONTAINER_NAME=$DB_CRUD_CONTAINER_NAME MYSQL_USER=$MYSQL_USER MYSQL_PASSWORD=$MYSQL_PASSWORD MYSQL_DATABASE=$MYSQL_DATABASE API_NODE_CONTAINER_NAME=$API_NODE_CONTAINER_NAME CRUD_USERS_NET=$CRUD_USERS_NET REACT_FRONT_CONTAINER_NAME=$REACT_FRONT_CONTAINER_NAME FRONT_NET=$FRONT_NET"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker compose down --rmi all"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker compose up -d"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker ps"

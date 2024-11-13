@@ -100,7 +100,6 @@
 ![deploy stage](./imgs/deploy.png)
 
 ![deployment job p1](./imgs/deploy-1.png)
-![deployment job p2](./imgs/deploy-2.png)
 
 ## Healthcheck
 

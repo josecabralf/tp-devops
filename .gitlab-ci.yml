@@ -1,11 +1,11 @@
 stages:
   - build
-  # - sast-scan
-  # - code-linting
-  # - docker-linting
+  - sast-scan
+  - code-linting
+  - docker-linting
   - image-scan
-  # - deploy
-  # - healthcheck
+  - deploy
+  - healthcheck
 
 variables:
   ALUMNO: 85505-85829-92425
@@ -13,7 +13,7 @@ variables:
   DOCKER_BACK_NETWORK: crud-users-net
   DOCKER_FRONT_NETWORK: front-net
 
-# secrets-scan:
+secrets-scan:
   stage: sast-scan
   image: python:3.10
   tags:
@@ -28,7 +28,7 @@ variables:
     paths:
       - $ARTIFACT_FILE_NAME
 
-# sast-scan-python:
+sast-scan-python:
   image: python:3.10
   stage: sast-scan
   tags:
@@ -45,7 +45,7 @@ variables:
     paths:
       - $ARTIFACT_FILE_NAME
 
-# sca-scan-python:
+sca-scan-python:
   image: python:3.10
   stage: sast-scan
   tags:
@@ -62,7 +62,7 @@ variables:
     paths:
       - $ARTIFACT_FILE_NAME
 
-# sast-scan-js:
+sast-scan-js:
   stage: sast-scan
   image: python:3.10
   variables:
@@ -82,7 +82,7 @@ variables:
       - $ARTIFACT_FILE_NAME_NODE
       - $ARTIFACT_FILE_NAME_REACT
 
-# sca-scan-js:
+sca-scan-js:
   stage: sast-scan
   image: docker
   tags:
@@ -122,7 +122,7 @@ variables:
       - $ARTIFACT_FILE_NAME_NODE
       - $ARTIFACT_FILE_NAME_REACT
 
-# code-lint-python:
+code-lint-python:
   image: python:3.10
   stage: code-linting
   tags:
@@ -140,7 +140,7 @@ variables:
     paths:
       - $ARTIFACT_FILE_NAME
 
-# code-lint-node:
+code-lint-node:
   image: node:18
   stage: code-linting
   tags:
@@ -158,7 +158,7 @@ variables:
     paths:
       - $ARTIFACT_FILE_NAME
 
-# code-lint-react:
+code-lint-react:
   image: node:18
   stage: code-linting
   tags:
@@ -176,7 +176,7 @@ variables:
     paths:
       - $ARTIFACT_FILE_NAME
 
-# docker-lint:
+docker-lint:
   image: python:3.10
   stage: docker-linting
   tags:
@@ -371,7 +371,7 @@ scan-api-image:
   tags: [$TAG]
   variables:
     PATH_SERVER_USR: devops
-    DOCKER_IMAGE_NAME: $CI_REGISTRY/api-crud-users-$ALUMNO:1.0.0
+    DOCKER_IMAGE_NAME: $CI_REGISTRY/api-crud-users-$ALUMNO:latest
     DOCKER_BUILDKIT: "1"
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://docker:2375
@@ -397,53 +397,181 @@ scan-api-image:
       - $ARTIFACT_FILE_NAME
   allow_failure: true
 
-# deployment:
-#   stage: deploy
-#   image: alpine:3.18.4
-#   tags: [$TAG]
-#   variables:
-#     PATH_SERVER_USR: devops
-#     PATH_COMPOSE: ./docker-compose.yml
-#   before_script:
-#     - 'which ssh-agent || ( apk update && apk add openssh-client)'
-#     - eval $(ssh-agent -s)
-#     - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
-#     - mkdir -p ~/.ssh
-#     - chmod 700 ~/.ssh
-#     - mkdir -p  /usr/local/share/ca-certificates || exit
-#     - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
-#   script:
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker network create $DOCKER_BACK_NETWORK || true"
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker network create $DOCKER_FRONT_NETWORK || true"
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "rm -r $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO || true"
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/data"
-#     - scp $PATH_COMPOSE $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin  $CI_REGISTRY "
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker compose down --rmi all"
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker compose up -d"
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker ps"
+scan-nginx-image:
+  image: docker
+  stage: image-scan
+  tags: [$TAG]
+  variables:
+    PATH_SERVER_USR: devops
+    DOCKER_IMAGE_NAME: $CI_REGISTRY/nginx-users-$ALUMNO:latest
+    DOCKER_BUILDKIT: "1"
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    CA_CERTIFICATE: "$CA_CERTIFICATE"
+    ARTIFACT_FILE_NAME: nginx-trivy-scan.txt
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - mkdir -p  /usr/local/share/ca-certificates || exit
+    - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
+  script:
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker pull aquasec/trivy:0.55.0"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin  $CI_REGISTRY "
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker run -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy:0.55.0 image --scanners vuln $DOCKER_IMAGE_NAME > $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts/$ARTIFACT_FILE_NAME"
+    - scp $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts/$ARTIFACT_FILE_NAME $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
+  allow_failure: true
 
-# healthcheck:
-#   stage: healthcheck
-#   image: alpine:3.18.4
-#   tags: [$TAG]
-#   variables:
-#     PATH_HEALTHCHECK_SCRIPT: ./scripts/healthcheck.sh
-#     PATH_SERVER_USR: devops
-#     HEALTHCHECK_OUTPUT: healthcheck.log
-#   before_script:
-#     - 'which ssh-agent || ( apk update && apk add openssh-client)'
-#     - eval $(ssh-agent -s)
-#     - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
-#     - mkdir -p ~/.ssh
-#     - chmod 700 ~/.ssh
-#     - mkdir -p  /usr/local/share/ca-certificates || exit
-#     - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
-#   script:
-#     - scp -o "StrictHostKeyChecking=no" $PATH_HEALTHCHECK_SCRIPT $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "chmod +x $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/healthcheck.sh"
-#     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && bash ./healthcheck.sh > $HEALTHCHECK_OUTPUT"
-#     - scp -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/$HEALTHCHECK_OUTPUT .
-#   artifacts:
-#     paths:
-#       - $HEALTHCHECK_OUTPUT
+scan-api-node-image:
+  image: docker
+  stage: image-scan
+  tags: [$TAG]
+  variables:
+    PATH_SERVER_USR: devops
+    DOCKER_IMAGE_NAME: $CI_REGISTRY/api-node-$ALUMNO:latest
+    DOCKER_BUILDKIT: "1"
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    CA_CERTIFICATE: "$CA_CERTIFICATE"
+    ARTIFACT_FILE_NAME: api-node-trivy-scan.txt
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - mkdir -p  /usr/local/share/ca-certificates || exit
+    - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
+  script:
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker pull aquasec/trivy:0.55.0"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin  $CI_REGISTRY "
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker run -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy:0.55.0 image --scanners vuln $DOCKER_IMAGE_NAME > $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts/$ARTIFACT_FILE_NAME"
+    - scp $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts/$ARTIFACT_FILE_NAME $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
+  allow_failure: true
+
+scan-db-image:
+  image: docker
+  stage: image-scan
+  tags: [$TAG]
+  variables:
+    PATH_SERVER_USR: devops
+    DOCKER_IMAGE_NAME: $CI_REGISTRY/db-crud-users-$ALUMNO:latest
+    DOCKER_BUILDKIT: "1"
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    CA_CERTIFICATE: "$CA_CERTIFICATE"
+    ARTIFACT_FILE_NAME: db-trivy-scan.txt
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - mkdir -p  /usr/local/share/ca-certificates || exit
+    - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
+  script:
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker pull aquasec/trivy:0.55.0"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin  $CI_REGISTRY "
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker run -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy:0.55.0 image --scanners vuln $DOCKER_IMAGE_NAME > $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts/$ARTIFACT_FILE_NAME"
+    - scp $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts/$ARTIFACT_FILE_NAME $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
+  allow_failure: true
+
+scan-react-image:
+  image: docker
+  stage: image-scan
+  tags: [$TAG]
+  variables:
+    PATH_SERVER_USR: devops
+    DOCKER_IMAGE_NAME: $CI_REGISTRY/react-front-$ALUMNO:latest
+    DOCKER_BUILDKIT: "1"
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    CA_CERTIFICATE: "$CA_CERTIFICATE"
+    ARTIFACT_FILE_NAME: react-trivy-scan.txt
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - mkdir -p  /usr/local/share/ca-certificates || exit
+    - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
+  script:
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker pull aquasec/trivy:0.55.0"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin  $CI_REGISTRY "
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker run -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/Library/Caches:/root/.cache/ aquasec/trivy:0.55.0 image --scanners vuln $DOCKER_IMAGE_NAME > $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts/$ARTIFACT_FILE_NAME"
+    - scp $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/artifacts/$ARTIFACT_FILE_NAME $ARTIFACT_FILE_NAME
+  artifacts:
+    paths:
+      - $ARTIFACT_FILE_NAME
+  allow_failure: true
+
+deployment:
+  stage: deploy
+  image: alpine:3.18.4
+  tags: [$TAG]
+  variables:
+    PATH_SERVER_USR: devops
+    PATH_COMPOSE: ./docker-compose.yml
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - mkdir -p  /usr/local/share/ca-certificates || exit
+    - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
+  script:
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker network create $DOCKER_BACK_NETWORK || true"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker network create $DOCKER_FRONT_NETWORK || true"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "rm -r $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO || true"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "mkdir -p $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/data"
+    - scp $PATH_COMPOSE $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin  $CI_REGISTRY "
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker compose down --rmi all"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker compose up -d"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker ps"
+
+healthcheck:
+  stage: healthcheck
+  image: alpine:3.18.4
+  tags: [$TAG]
+  variables:
+    PATH_HEALTHCHECK_SCRIPT: ./scripts/healthcheck.sh
+    PATH_SERVER_USR: devops
+    HEALTHCHECK_OUTPUT: healthcheck.log
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - mkdir -p  /usr/local/share/ca-certificates || exit
+    - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
+  script:
+    - scp -o "StrictHostKeyChecking=no" $PATH_HEALTHCHECK_SCRIPT $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "chmod +x $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/healthcheck.sh"
+    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && bash ./healthcheck.sh > $HEALTHCHECK_OUTPUT"
+    - scp -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE:$PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO/$HEALTHCHECK_OUTPUT .
+  artifacts:
+    paths:
+      - $HEALTHCHECK_OUTPUT

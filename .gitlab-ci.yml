@@ -541,7 +541,6 @@ deployment:
     - mkdir -p  /usr/local/share/ca-certificates || exit
     - echo "$CA_CERTIFICATE" > /etc/ssl/certs/my-ca.crt || exit
   script:
-    - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "cd $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO && docker network prune -f && (docker stop $(docker ps -aq) || true) && (docker rm $(docker ps -aq) || true)"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker network create $DOCKER_BACK_NETWORK || true"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "docker network create $DOCKER_FRONT_NETWORK || true"
     - ssh -o "StrictHostKeyChecking=no" $SERVER_USR@$SERVER_INSTANCE "rm -r $PATH_SERVER_USR/$CI_PROJECT_NAME/$ALUMNO || true"

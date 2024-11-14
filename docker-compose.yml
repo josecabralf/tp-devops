@@ -2,63 +2,58 @@ version: '3'
 name: 12-docker-compose
 
 services:
-  
+
   nginx-users:
     image: registry-alumnos.labsis.frc.utn.edu.ar:8443/nginx-users-85505-85829-92425:latest
     build: nginx/
-    container_name: ${NGINX_CONTAINER_NAME}
     ports:
       - "8080:80"
     networks:
-      - ${CRUD_USERS_NET}
+      - crud-users-net
     restart: always
     links:
-      - ${API_CRUD_CONTAINER_NAME}:${API_CRUD_CONTAINER_NAME}
+      - api-crud-users:api-crud-users
 
   api-crud-users:
     image: registry-alumnos.labsis.frc.utn.edu.ar:8443/api-crud-users-85505-85829-92425:latest
     build: api/
-    container_name: ${API_CRUD_CONTAINER_NAME}
     networks:
-      - ${CRUD_USERS_NET}
+      - crud-users-net
     depends_on: 
-      - ${DB_CRUD_CONTAINER_NAME}
+      - db-crud-users
     environment:
-      - MYSQL_DATABASE_USER=${MYSQL_USER}
-      - MYSQL_DATABASE_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DATABASE_DB=${MYSQL_DATABASE}
-      - MYSQL_DATABASE_HOST=${DB_CRUD_CONTAINER_NAME}
+      - MYSQL_DATABASE_USER=testuser
+      - MYSQL_DATABASE_PASSWORD=testpass
+      - MYSQL_DATABASE_DB=utn
+      - MYSQL_DATABASE_HOST=db-crud-users
     links:
-      - "${DB_CRUD_CONTAINER_NAME}:${DB_CRUD_CONTAINER_NAME}"
+      - "db-crud-users:db-crud-users"
 
   api-node:
     image: registry-alumnos.labsis.frc.utn.edu.ar:8443/api-node-85505-85829-92425:latest
     build: api-node/
-    container_name: ${API_NODE_CONTAINER_NAME}
     networks:
-      - ${CRUD_USERS_NET}
+      - crud-users-net
 
   db-crud-users:
     image: registry-alumnos.labsis.frc.utn.edu.ar:8443/db-crud-users-85505-85829-92425:latest
     build: db/
-    container_name: ${DB_CRUD_CONTAINER_NAME}
     restart: always
     networks:
-      - ${CRUD_USERS_NET}
+      - crud-users-net
     volumes:
       - data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: r00t
+      MYSQL_DATABASE: utn
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
 
   react-front:
     image: registry-alumnos.labsis.frc.utn.edu.ar:8443/react-front-85505-85829-92425:latest
     build: web/
-    container_name: ${REACT_FRONT_CONTAINER_NAME}
     networks:
-      - ${FRONT_NET}
+      - front-net
     ports:
       - "3000:80"
 

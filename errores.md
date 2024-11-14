@@ -28,3 +28,6 @@ Sin problemas, pudimos trabajar con lo aprendido.
 Sin problemas.
 
 ### ETAPA: DEPLOY
+
+No tuvimos en cuenta que el docker compose corre en un contenedor aparte, por lo que no estabamos pudiendo obtener las variables
+de  entorno directamente.

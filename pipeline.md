@@ -1,5 +1,8 @@
 # Pipeline Completa
 
+![pipeline completa](./imgs/pipeline.png)
+El registry estaba sobrecargado pero las imagenes pusheadas.
+
 ## BUILD
 
 ![build stage](./imgs/build_stage.png)

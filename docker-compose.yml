@@ -1,5 +1,3 @@
-name: 12-docker-compose
-
 services:
 
   nginx-users:

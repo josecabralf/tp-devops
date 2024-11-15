@@ -1,9 +1,9 @@
 stages:
-  - build
   - sast-scan
   - code-linting
   - docker-linting
   - image-scan
+  - build
   - deploy
   - healthcheck
 
